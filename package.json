@@ -1,0 +1,26 @@
+{
+  "name": "camera-dodge-game",
+  "version": "1.0.0",
+  "description": "Dodge falling objects using your body! A webcam-based AR game with MediaPipe Pose detection.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "game",
+    "webcam",
+    "mediapipe",
+    "pose-detection",
+    "ar"
+  ],
+  "author": "Tokio Hata",
+  "license": "MIT",
+  "dependencies": {
+    "@mediapipe/tasks-vision": "^0.10.34",
+    "firebase": "^12.12.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.9"
+  }
+}

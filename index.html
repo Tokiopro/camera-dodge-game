@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Camera Dodge Game</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+    #overlay.active { pointer-events: auto; }
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      background: rgba(0,0,0,0.75);
+      padding: 40px;
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+    }
+    .screen.visible { display: flex; }
+    h1 { font-size: 2.5rem; }
+    h2 { font-size: 1.8rem; }
+    .subtitle { font-size: 1.1rem; opacity: 0.8; }
+    .btn {
+      padding: 14px 40px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.1s;
+    }
+    .btn:active { transform: scale(0.95); }
+    .btn-primary { background: #ff4757; color: #fff; }
+    .btn-secondary { background: #2ed573; color: #fff; }
+    #name-input {
+      padding: 10px 20px;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      border: 2px solid #fff;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      text-align: center;
+      width: 200px;
+    }
+    #name-input::placeholder { color: rgba(255,255,255,0.5); }
+    .score-display { font-size: 3rem; font-weight: bold; color: #ffa502; }
+    .ranking-list {
+      list-style: none;
+      width: 280px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .ranking-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      font-size: 1rem;
+    }
+    .ranking-list li:first-child { color: #ffd700; font-weight: bold; }
+    .ranking-list li:nth-child(2) { color: #c0c0c0; }
+    .ranking-list li:nth-child(3) { color: #cd7f32; }
+    .rank-num { width: 30px; }
+    .rank-name { flex: 1; text-align: left; margin-left: 8px; }
+    .rank-score { width: 60px; text-align: right; }
+    #hud {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 5;
+      font-size: 1.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+    #lives { color: #ff4757; }
+    #timer { color: #ffa502; font-weight: bold; }
+    .loading { font-size: 1rem; opacity: 0.7; }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="game-canvas"></canvas>
+    <div id="hud" style="display:none;">
+      <div id="lives"></div>
+      <div id="timer">0.0s</div>
+    </div>
+    <div id="overlay" class="active">
+      <div id="start-screen" class="screen visible">
+        <h1>📷 Camera Dodge</h1>
+        <p class="subtitle">体を動かして落下物を避けろ！</p>
+        <p class="loading" id="loading-status">カメラ準備中...</p>
+        <button class="btn btn-primary" id="start-btn" disabled>START</button>
+      </div>
+      <div id="gameover-screen" class="screen">
+        <h2>💀 GAME OVER</h2>
+        <div class="score-display" id="final-score">0.0s</div>
+        <input type="text" id="name-input" placeholder="名前を入力" maxlength="12" />
+        <button class="btn btn-secondary" id="save-btn">ランキング登録</button>
+        <h3>🏆 Top 10</h3>
+        <ol class="ranking-list" id="ranking-list"></ol>
+        <button class="btn btn-primary" id="retry-btn">もう一度</button>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
