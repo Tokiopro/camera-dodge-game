@@ -14,6 +14,13 @@ export interface PlayerLandmark {
   visibility: number;
 }
 
+export interface HitEffect {
+  x: number;
+  y: number;
+  createdAt: number;
+  emoji: string;
+}
+
 export interface GameState {
   status: "idle" | "playing" | "gameover";
   lives: number;
@@ -24,6 +31,7 @@ export interface GameState {
   difficulty: number;
   landmarks: PlayerLandmark[];
   invincibleUntil: number;
+  hitEffects: HitEffect[];
 }
 
 export interface RankingEntry {

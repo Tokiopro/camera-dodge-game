@@ -1,4 +1,4 @@
-import type { GameState } from "./types";
+import type { GameState, HitEffect } from "./types";
 import { spawnObject, updateObjects, checkCollisions } from "./objects";
 import { detectPose } from "./pose";
 import { renderFrame } from "./renderer";
@@ -19,6 +19,7 @@ export function createGameState(): GameState {
     difficulty: 1,
     landmarks: [],
     invincibleUntil: 0,
+    hitEffects: [],
   };
 }
 
@@ -34,6 +35,7 @@ export function startGame(state: GameState): GameState {
     difficulty: 1,
     landmarks: [],
     invincibleUntil: 0,
+    hitEffects: [],
   };
 }
 
@@ -83,7 +85,7 @@ export function gameLoop(
   // Check collisions (only if not invincible)
   const isInvincible = now < newState.invincibleUntil;
   if (!isInvincible) {
-    const { hit, remaining } = checkCollisions(
+    const { hit, remaining, hitPoints } = checkCollisions(
       newState.objects,
       newState.landmarks,
       canvas.width,
@@ -96,14 +98,35 @@ export function gameLoop(
       newState.invincibleUntil = now + INVINCIBLE_DURATION;
       onLifeLost();
 
+      const newEffects: HitEffect[] = hitPoints.map((p) => ({
+        x: p.x,
+        y: p.y,
+        createdAt: now,
+        emoji: p.emoji,
+      }));
+      newState.hitEffects = [...newState.hitEffects, ...newEffects];
+
       if (newState.lives <= 0) {
         newState.status = "gameover";
         const score = Math.round(newState.elapsed * 10) / 10;
+
+        // Render final frame with hit effect before gameover
+        renderFrame(
+          ctx, video, canvas, newState.objects, newState.landmarks,
+          false, newState.hitEffects
+        );
+
         onGameOver(score);
         return newState;
       }
     }
   }
+
+  // Expire old hit effects
+  const EFFECT_DURATION = 600;
+  newState.hitEffects = newState.hitEffects.filter(
+    (e) => now - e.createdAt < EFFECT_DURATION
+  );
 
   // Render
   renderFrame(
@@ -112,7 +135,8 @@ export function gameLoop(
     canvas,
     newState.objects,
     newState.landmarks,
-    isInvincible
+    isInvincible,
+    newState.hitEffects
   );
 
   return newState;
