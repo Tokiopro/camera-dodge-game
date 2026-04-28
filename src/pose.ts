@@ -1,4 +1,4 @@
-import { PoseLandmarker, FilesetResolver, DrawingUtils } from "@mediapipe/tasks-vision";
+import { PoseLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 import type { PlayerLandmark } from "./types";
 
 let poseLandmarker: PoseLandmarker | null = null;
@@ -23,30 +23,20 @@ export function detectPose(
   timestamp: number
 ): PlayerLandmark[] {
   if (!poseLandmarker) return [];
+  if (video.readyState < 2) return [];
 
-  const result = poseLandmarker.detectForVideo(video, timestamp);
-  if (!result.landmarks || result.landmarks.length === 0) return [];
+  try {
+    const result = poseLandmarker.detectForVideo(video, timestamp);
+    if (!result.landmarks || result.landmarks.length === 0) return [];
 
-  return result.landmarks[0].map((lm) => ({
-    x: lm.x,
-    y: lm.y,
-    visibility: lm.visibility ?? 0,
-  }));
-}
-
-export function drawPoseLandmarks(
-  ctx: CanvasRenderingContext2D,
-  landmarks: PlayerLandmark[],
-  width: number,
-  height: number
-): void {
-  if (landmarks.length === 0) return;
-
-  ctx.fillStyle = "rgba(0, 255, 128, 0.6)";
-  for (const lm of landmarks) {
-    if (lm.visibility < 0.5) continue;
-    ctx.beginPath();
-    ctx.arc(lm.x * width, lm.y * height, 6, 0, Math.PI * 2);
-    ctx.fill();
+    return result.landmarks[0].map((lm) => ({
+      x: lm.x,
+      y: lm.y,
+      visibility: lm.visibility ?? 0,
+    }));
+  } catch (e) {
+    console.warn("detectPose failed:", e);
+    return [];
   }
 }
+
