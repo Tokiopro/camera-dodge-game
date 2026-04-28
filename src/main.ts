@@ -76,12 +76,17 @@ function onGameOver(score: number): void {
 }
 
 function tick(now: number): void {
-  const deltaTime = lastTime ? now - lastTime : 16;
+  const rawDelta = lastTime ? now - lastTime : 16;
+  const deltaTime = Math.min(rawDelta, 100);
   lastTime = now;
 
   if (state.status === "playing") {
-    state = gameLoop(state, video, canvas, ctx, now, deltaTime, onLifeLost, onGameOver);
-    updateHud();
+    try {
+      state = gameLoop(state, video, canvas, ctx, now, deltaTime, onLifeLost, onGameOver);
+      updateHud();
+    } catch (e) {
+      console.warn("gameLoop error, skipping frame:", e);
+    }
   }
 
   requestAnimationFrame(tick);
@@ -120,6 +125,8 @@ async function init(): Promise<void> {
     state = startGame(state);
     showScreen("none");
     lastTime = 0;
+    saveBtn.disabled = false;
+    saveBtn.textContent = "ランキング登録";
   });
 
   saveBtn.addEventListener("click", async () => {

@@ -38,11 +38,12 @@ export function checkCollisions(
   landmarks: PlayerLandmark[],
   canvasWidth: number,
   canvasHeight: number
-): { hit: boolean; remaining: FallingObject[] } {
-  if (landmarks.length === 0) return { hit: false, remaining: objects };
+): { hit: boolean; remaining: FallingObject[]; hitPoints: Array<{ x: number; y: number; emoji: string }> } {
+  if (landmarks.length === 0) return { hit: false, remaining: objects, hitPoints: [] };
 
   let hit = false;
   const remaining: FallingObject[] = [];
+  const hitPoints: Array<{ x: number; y: number; emoji: string }> = [];
 
   for (const obj of objects) {
     let objHit = false;
@@ -62,6 +63,7 @@ export function checkCollisions(
       if (dist < hitRadius + 20) {
         objHit = true;
         hit = true;
+        hitPoints.push({ x: obj.x, y: obj.y, emoji: obj.emoji });
         break;
       }
     }
@@ -71,7 +73,7 @@ export function checkCollisions(
     }
   }
 
-  return { hit, remaining };
+  return { hit, remaining, hitPoints };
 }
 
 export function drawObjects(
